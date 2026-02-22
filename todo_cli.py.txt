@@ -1,0 +1,96 @@
+# todo_cli.py
+# To-Do List CLI Application (CRUD in terminal)
+
+from typing import List, Dict
+
+Task = Dict[str, object]
+
+
+def print_menu() -> None:
+    print("\n=== TO-DO MANAGER ===")
+    print("1. Show tasks")
+    print("2. Add task")
+    print("3. Mark task as completed")
+    print("4. Delete task")
+    print("5. Exit")
+
+
+def show_tasks(tasks: List[Task]) -> None:
+    if not tasks:
+        print("Task list is empty.")
+        return
+
+    print("\nYour tasks:")
+    for idx, task in enumerate(tasks, start=1):
+        status = "✅" if task["done"] else "❌"
+        print(f"{idx}. {status} {task['title']}")
+
+
+def add_task(tasks: List[Task]) -> None:
+    title = input("Enter task title: ").strip()
+    if not title:
+        print("Task title cannot be empty.")
+        return
+
+    tasks.append({"title": title, "done": False})
+    print(f"Added: {title}")
+
+
+def read_task_number(tasks: List[Task], prompt: str) -> int:
+    if not tasks:
+        raise ValueError("Task list is empty.")
+
+    raw = input(prompt).strip()
+    number = int(raw)
+
+    if number < 1 or number > len(tasks):
+        raise ValueError(f"Please enter a number from 1 to {len(tasks)}.")
+
+    return number - 1
+
+
+def mark_completed(tasks: List[Task]) -> None:
+    try:
+        idx = read_task_number(tasks, "Enter task number to mark completed: ")
+        if tasks[idx]["done"]:
+            print("This task is already completed.")
+            return
+        tasks[idx]["done"] = True
+        print(f"Marked as completed: {tasks[idx]['title']}")
+    except ValueError as e:
+        print(f"Error: {e}")
+
+
+def delete_task(tasks: List[Task]) -> None:
+    try:
+        idx = read_task_number(tasks, "Enter task number to delete: ")
+        removed = tasks.pop(idx)
+        print(f"Deleted: {removed['title']}")
+    except ValueError as e:
+        print(f"Error: {e}")
+
+
+def main() -> None:
+    tasks: List[Task] = []
+
+    while True:
+        print_menu()
+        choice = input("Choose an option (1-5): ").strip()
+
+        if choice == "1":
+            show_tasks(tasks)
+        elif choice == "2":
+            add_task(tasks)
+        elif choice == "3":
+            mark_completed(tasks)
+        elif choice == "4":
+            delete_task(tasks)
+        elif choice == "5":
+            print("Goodbye!")
+            break
+        else:
+            print("Invalid option. Please choose 1-5.")
+
+
+if __name__ == "__main__":
+    main()
